@@ -4,13 +4,13 @@
 #include <conio.h>
 #include <windows.h>
 /*
-   - W,H: º¸µå Å©±â(8x8)
-   - SCALE_X/Y: Ä­ »çÀÌ ¿©¹é ½ºÄÉÀÏ(ÄÜ¼Ö ·»´õ È®´ë)
-   - BASE_X/Y: º¸µå ½ÃÀÛ ÁÂÇ¥(ÄÜ¼Ö ¿ÀÇÁ¼Â)
-   - board[y][x]: 0=ºóÄ­, 1..=¸ñÇ¥ ¼ıÀÚ
-   - expectedNum: ´ÙÀ½¿¡ ¸ÂÃç¾ß ÇÒ ¼ıÀÚ(ÃÊ±â 1)
-   - playerX: ÇöÀç ÃÑ±¸ ¿­(1..W)
-   - COLOR_*: ÄÜ¼Ö »ö»ó »ó¼ö
+   - W,H: ë³´ë“œ í¬ê¸°(8x8)
+   - SCALE_X/Y: ì¹¸ ì‚¬ì´ ì—¬ë°± ìŠ¤ì¼€ì¼(ì½˜ì†” ë Œë” í™•ëŒ€)
+   - BASE_X/Y: ë³´ë“œ ì‹œì‘ ì¢Œí‘œ(ì½˜ì†” ì˜¤í”„ì…‹)
+   - board[y][x]: 0=ë¹ˆì¹¸, 1..=ëª©í‘œ ìˆ«ì
+   - expectedNum: ë‹¤ìŒì— ë§ì¶°ì•¼ í•  ìˆ«ì(ì´ˆê¸° 1)
+   - playerX: í˜„ì¬ ì´êµ¬ ì—´(1..W)
+   - COLOR_*: ì½˜ì†” ìƒ‰ìƒ ìƒìˆ˜
 */
 #define W 8
 #define H 8
@@ -30,11 +30,11 @@ static const WORD COLOR_CYAN    = FOREGROUND_GREEN  | FOREGROUND_BLUE | FOREGROU
 static const WORD COLOR_YELLOW  = FOREGROUND_RED    | FOREGROUND_GREEN| FOREGROUND_INTENSITY;
 static const WORD COLOR_WHITE   = FOREGROUND_RED    | FOREGROUND_GREEN| FOREGROUND_BLUE | FOREGROUND_INTENSITY;
 
-static int board[H+1][W+1];   /* 0=ºóÄ­, 1..=¸ñÇ¥ ¼ıÀÚ */
-static int expectedNum = 1;   /* ´ÙÀ½¿¡ ¸ÂÃâ ¼ıÀÚ */
-static int playerX = 1;       /* ÃÑ±¸ X(1..W) */
+static int board[H+1][W+1];   /* 0=ë¹ˆì¹¸, 1..=ëª©í‘œ ìˆ«ì */
+static int expectedNum = 1;   /* ë‹¤ìŒì— ë§ì¶œ ìˆ«ì */
+static int playerX = 1;       /* ì´êµ¬ X(1..W) */
 
-/* ====== ÄÜ¼Ö À¯Æ¿ ====== */
+/* ====== ì½˜ì†” ìœ í‹¸ ====== */
 void gotoxy(int x, int y){ COORD p={x-1,y-1}; SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), p); }
 void setColor(WORD a){ SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), a); }
 void clearScr(void){ system("cls"); }
@@ -51,7 +51,7 @@ int read_key(void){
             if(e==77) return 'R';
             return 0;
         }
-        return ch; /* ' ', Enter=13, ESC=27, q/Q µî */
+        return ch; /* ' ', Enter=13, ESC=27, q/Q ë“± */
     }
 }
 
@@ -62,7 +62,7 @@ int get_console_cols(void){
     return 120;
 }
 
-/* ====== ÁÂÇ¥ ¸ÅÇÎ ====== */
+/* ====== ì¢Œí‘œ ë§¤í•‘ ====== */
 static void cell_pos(int x, int y, int* px, int* py){
     *px = BASE_X + 2*((x-1)*SCALE_X + 1);
     *py = BASE_Y + 1 + ((y-1)*SCALE_Y + 1);
@@ -84,12 +84,12 @@ void get_hud_origin(int* hud_x, int* hud_y){
     else                    { *hud_x = BASE_X + 2; *hud_y = B + 1; }
 }
 
-/* ====== ASCII ¹è³Ê ====== */
+/* ====== ASCII ë°°ë„ˆ ====== */
 void splash_order_rush(void){
     clearScr();
     setColor(COLOR_CYAN);
 
-    gotoxy(BASE_X+3, BASE_Y+2);  printf("  ____    _____    _____    _____	__ _____");
+    gotoxy(BASE_X+3, BASE_Y+2);  printf("  ____    _____    _____    _______  _____");
     gotoxy(BASE_X+3, BASE_Y+3);  printf(" / __ \\  |  __ \\  |  __ \\  / _____| |  __ \\");
     gotoxy(BASE_X+3, BASE_Y+4);  printf("| |  | | | |__) | | |  | | | |_____ | |__) |");
     gotoxy(BASE_X+3, BASE_Y+5);  printf("| |  | | |  _  /  | |  | | |  ____| |  _  /");
@@ -104,7 +104,7 @@ void splash_order_rush(void){
     gotoxy(BASE_X+3, BASE_Y+14); printf("|_|  \\_\\ \\____/  |______/  |_|  |_|");
 
     setColor(COLOR_WHITE);
-    gotoxy(BASE_X+10, BASE_Y+17); printf("¾Æ¹« Å°³ª ´©¸£¼¼¿ä...");
+    gotoxy(BASE_X+10, BASE_Y+17); printf("ì•„ë¬´ í‚¤ë‚˜ ëˆ„ë¥´ì„¸ìš”...");
     setColor(COLOR_DEFAULT);
     _getch();
 }
@@ -174,7 +174,7 @@ void ascii_lose(void){
 }
 
 
-/* Try Again? / Quit ¸Ş´º (±×´ë·Î) */
+/* Try Again? / Quit ë©”ë‰´ (ê·¸ëŒ€ë¡œ) */
 int ascii_try_again_or_quit(void){
     int sel=0;
     ascii_tryagain();
@@ -194,17 +194,17 @@ int ascii_try_again_or_quit(void){
     }
 }
 
-/* ====== ´Ü°è ¼±ÅÃ ====== */
+/* ====== ë‹¨ê³„ ì„ íƒ ====== */
 int stage_select(void){
     int n=1;
     for(;;){
         clearScr();
         setColor(COLOR_WHITE);
-        gotoxy(BASE_X+8,BASE_Y+4); printf("1ºÎÅÍ ¼ø¼­´ë·Î ½î¸é µË´Ï´Ù!");
-        gotoxy(BASE_X+8,BASE_Y+6); printf("¿À¸¥ÂÊÅ°, ¿ŞÂÊÅ°¸¦ »ç¿ëÇØ ¿òÁ÷ÀÏ ¼ö ÀÖ½À´Ï´Ù.");
-        gotoxy(BASE_X+8,BASE_Y+7); printf("ENTER¸¦ ´©¸£¸é ½ÃÀÛÇÕ´Ï´Ù.");
+        gotoxy(BASE_X+8,BASE_Y+4); printf("1ë¶€í„° ìˆœì„œëŒ€ë¡œ ì˜ë©´ ë©ë‹ˆë‹¤!");
+        gotoxy(BASE_X+8,BASE_Y+6); printf("ì˜¤ë¥¸ìª½í‚¤, ì™¼ìª½í‚¤ë¥¼ ì‚¬ìš©í•´ ì›€ì§ì¼ ìˆ˜ ìˆìŠµë‹ˆë‹¤.");
+        gotoxy(BASE_X+8,BASE_Y+7); printf("ENTERë¥¼ ëˆ„ë¥´ë©´ ì‹œì‘í•©ë‹ˆë‹¤.");
         setColor(COLOR_RED);
-        gotoxy(BASE_X+8,BASE_Y+9); printf("Á¾·á¸¦ ¿øÇÏ½Ã¸é esc¸¦ ´©¸£½Ã¿À.");
+        gotoxy(BASE_X+8,BASE_Y+9); printf("ì¢…ë£Œë¥¼ ì›í•˜ì‹œë©´ escë¥¼ ëˆ„ë¥´ì‹œì˜¤.");
         setColor(COLOR_WHITE);
         gotoxy(BASE_X+8,BASE_Y+11); printf("Select Stage (1~61)");
         setColor(COLOR_YELLOW);
@@ -220,23 +220,23 @@ int stage_select(void){
     }
 }
 
-/* ====== ÇÁ·¹ÀÓ & ¶óº§ ====== */
+/* ====== í”„ë ˆì„ & ë¼ë²¨ ====== */
 void draw_static_frame(void){
     int L,T,R,B; get_grid_rect(&L,&T,&R,&B);
 
     clearScr();
-    /* »ó´Ü */
+    /* ìƒë‹¨ */
     gotoxy(L, T); printf("+"); for(int x=L+1; x<=R-1; ++x) printf("-"); printf("+");
-    /* º»¹® */
+    /* ë³¸ë¬¸ */
     for(int y=T+1; y<=B-1; ++y){
         gotoxy(L, y); printf("|");
         for(int x=L+1; x<=R-1; ++x) printf(" ");
         printf("|");
     }
-    /* ÇÏ´Ü */
+    /* í•˜ë‹¨ */
     gotoxy(L, B); printf("+"); for(int x=L+1; x<=R-1; ++x) printf("-"); printf("+");
 
-    /* ³»ºÎ ¼¼·Î¼±: 1..W-1 (¾ç³¡ Á¦¿Ü) */
+    /* ë‚´ë¶€ ì„¸ë¡œì„ : 1..W-1 (ì–‘ë ì œì™¸) */
     for(int col=1; col<=W-1; ++col){
         int px, py; cell_pos(col, 1, &px, &py);
         for(int y=T+1; y<=B-1; ++y){ gotoxy(px, y); printf("|"); }
@@ -252,7 +252,7 @@ void draw_column_labels(void){
     }
 }
 
-/* ====== ¼¿/ÃÑ±¸/HUD ====== */
+/* ====== ì…€/ì´êµ¬/HUD ====== */
 void redraw_cell(int x, int y){
     int px, py; cell_pos(x,y,&px,&py);
     gotoxy(px-1, py);
@@ -282,17 +282,17 @@ void update_hud_at(int sx, int sy, int stage, int nextNum, int bullets, int msRe
     gotoxy(sx, sy+1); printf("Next  : %-2d  ", nextNum);
     gotoxy(sx, sy+2); printf("bullet  : %-3d ", bullets);
     gotoxy(sx, sy+3); printf("Time  : %02d.%01d s ", msRemain/1000, (msRemain%1000)/100);
-    gotoxy(sx, sy+5); setColor(COLOR_CYAN); printf("Move: ¿ŞÂÊÅ°/¿À¸¥ÂÊÅ°    ");
+    gotoxy(sx, sy+5); setColor(COLOR_CYAN); printf("Move: ì™¼ìª½í‚¤/ì˜¤ë¥¸ìª½í‚¤    ");
     gotoxy(sx, sy+6); printf("Fire: SPACE         ");
     gotoxy(sx, sy+7); printf("Quit: Q             "); setColor(COLOR_DEFAULT);
 }
 
-/* ====== ¼ö¿ë·® °¡µå ====== */
+/* ====== ìˆ˜ìš©ëŸ‰ ê°€ë“œ ====== */
 static int min_rows_needed(int remaining){
     return (remaining + W - 1) / W;
 }
 
-/* ====== ¹èÄ¡ ====== */
+/* ====== ë°°ì¹˜ ====== */
 void init_targets_monotone(int goals, int stage){
     for(int y=1;y<=H;y++) for(int x=1;x<=W;x++) board[y][x]=0;
     expectedNum=1;
@@ -324,8 +324,9 @@ void init_targets_monotone(int goals, int stage){
     playerX=1;
 }
 
-/* ====== »ç°İ ====== */
+/* ====== ì‚¬ê²© ====== */
 void fire_shot(void){
+    for(int y=H; y>=1; --y){
         if(board[y][playerX]!=0){
             int v=board[y][playerX];
             if(v==expectedNum){
@@ -342,11 +343,12 @@ void fire_shot(void){
     }
 }
 
-/* ====== ½ºÅ×ÀÌÁö ÄÁÆ®·Ñ ====== */
+
+/* ====== ìŠ¤í…Œì´ì§€ ì»¨íŠ¸ë¡¤ ====== */
 int run_stage(int n){
-    int goals   = n + 3;//¸ñÇ¥¹° 
-    int bullets = n + 4;//ÃÑ¾Ë 
-    int limit   = 5000 + (3*(n-1)) * 1000;//½Ã°£ 
+    int goals   = n + 3;//ëª©í‘œë¬¼ 
+    int bullets = n + 4;//ì´ì•Œ 
+    int limit   = 5000 + (3*(n-1)) * 1000;//ì‹œê°„ 
 
     int HUD_X, HUD_Y;
     DWORD t0;
@@ -365,23 +367,23 @@ int run_stage(int n){
         int elapsed=(int)(GetTickCount()-t0);
         int remain = limit - elapsed; if(remain<0) remain=0;
 
-        /* HUD 0.1ÃÊ¸¶´Ù °»½Å */
+        /* HUD 0.1ì´ˆë§ˆë‹¤ ê°±ì‹  */
         int hudTick = remain/100;
         if(hudTick!=lastHudTick){
             update_hud_at(HUD_X, HUD_Y, n, expectedNum, bullets, remain);
             lastHudTick=hudTick;
         }
 
-        /* Á¾·á Á¶°Ç: ¼º°ø / ½ÇÆĞ ±¸ºĞ */
-        if(expectedNum>goals){                 /* ¼º°ø */
+        /* ì¢…ë£Œ ì¡°ê±´: ì„±ê³µ / ì‹¤íŒ¨ êµ¬ë¶„ */
+        if(expectedNum>goals){                 /* ì„±ê³µ */
             ascii_congratulations();
             return 1;
         }
-        if(remain==0 || bullets==0){           /* ½ÇÆĞ: ½Ã°£ ¶Ç´Â Åº¾à ¼ÒÁø */
+        if(remain==0 || bullets==0){           /* ì‹¤íŒ¨: ì‹œê°„ ë˜ëŠ” íƒ„ì•½ ì†Œì§„ */
             return 0;
         }
 
-        /* ÀÔ·Â */
+        /* ì…ë ¥ */
         int k=read_key();
         if(!k){ Sleep(5); continue; }
         if(k=='q'||k=='Q'){ ascii_goodbye(); exit(0); }
@@ -409,9 +411,8 @@ int main(void){
             ascii_lose();
         }
 
-        // ¸Ş´º´Â Ç×»ó ¸ŞÀÎ¿¡¼­ ´Ü ÇÑ ¹ø¸¸
+        // ë©”ë‰´ëŠ” í•­ìƒ ë©”ì¸ì—ì„œ ë‹¨ í•œ ë²ˆë§Œ
         if(!ascii_try_again_or_quit()){ ascii_goodbye(); break; }
     }
     return 0;
 }
-
