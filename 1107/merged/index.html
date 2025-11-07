@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>미니게임 허브: 러너 & 에임 트레이너</title>
+  <link rel="stylesheet" href="style.css" />
+  <script src="https://cdn.babylonjs.com/babylon.js"></script>
+  <script src="https://cdn.babylonjs.com/loaders/babylonjs.loaders.min.js"></script>
+</head>
+<body>
+  <!-- 메뉴로 돌아가기 버튼 -->
+  <button id="backButton" class="back-button">◀ 메뉴로</button>
+
+  <div id="app">
+    <!-- 2D 메인 캔버스 (러너 전용) -->
+    <canvas id="gameCanvas" width="480" height="720"></canvas>
+
+    <!-- 3D 렌더 캔버스 (에임 트레이너 전용) -->
+    <canvas id="renderCanvas3D" style="position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; display: none; pointer-events: auto; z-index: 1;"></canvas>
+
+    <!-- 에임 트레이너 시작 화면 제거: 자동 시작으로 변경 -->
+
+    <!-- 메인 메뉴 -->
+    <div id="menu" class="overlay show">
+      <img src="image/logo.png" id="logo" class="logo" alt="미니게임 천국" />
+      <div class="grid">
+        <button class="card" data-game="runner">
+          <span class="title">러너</span>
+          <span class="desc">키보드 방향키를 이용한 장애물 피하기 게임</span>
+        </button>
+        <button class="card" data-game="clicker">
+          <span class="title">에임 트레이너</span>
+          <span class="desc">마우스를 이용한 포인터 게임</span>
+        </button>
+        <button class="card" data-game="fishing">
+          <span class="title">낚시</span>
+          <span class="desc">타이밍 캐스팅, 마우스 휠을 이용한 게임</span>
+        </button>
+        <button class="card" data-game="challenge">
+          <span class="title">Challenge</span>
+          <span class="desc">3게임 랜덤 챌린지 모드!</span>
+        </button>
+      </div>
+
+    </div>
+
+    <!-- HUD / 게임오버 -->
+    <div id="hud" class="overlay hidden">
+      <div class="row">
+        <div>점수: <span id="score">0</span></div>
+        <div id="timerWrap" class="timer-display hidden"> <span id="timer">30</span> </div>
+  <div id="bestWrap" class="hidden">최고: <span id="best">0</span></div>
+        <div id="goalWrap" class="goal hidden">
+          목표: <span id="goalValue">0</span>
+        </div>
+      </div>
+      <div id="targetWrap" class="target-display hidden"><span id="targetText"></span></div>
+    </div>
+
+    <div id="gameOver" class="gameover hidden">
+      <div class="panel">
+        <h2 id="gameOverTitle">게임 오버</h2>
+        <p id="gameOverMessage" style="color: #666; font-size: 14px; margin: 5px 0 15px 0;"></p>
+        <p>이번 점수: <span id="finalScore">0</span></p>
+        <p>최고 점수: <span id="finalBest">0</span></p>
+        <div id="extraStats" class="extra-stats">
+          <div class="extra-stat">
+            <span class="label">정확도</span>
+            <span id="finalAccuracy" class="value">0%</span>
+          </div>
+          <div class="extra-stat">
+            <span class="label">최대 콤보</span>
+            <span id="finalMaxCombo" class="value">×0</span>
+          </div>
+          <div class="extra-stat">
+            <span class="label">총 발사</span>
+            <span id="finalShots" class="value">0발</span>
+          </div>
+          <div class="extra-stat">
+            <span class="label">명중</span>
+            <span id="finalHits" class="value">0발</span>
+          </div>
+        </div>
+        <div class="actions">
+          <button id="retryBtn">다시하기</button>
+          <button id="menuBtn">메뉴로</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Challenge countdown overlay -->
+    <div id="countdown" class="overlay hidden">
+      <div class="panel" style="text-align:center; padding: 24px 32px;">
+        <h2 style="margin:0 0 10px 0;">Challenge</h2>
+        <div id="countdownNumber" class="countdown-number" style="font-size:64px; font-weight:800;">3</div>
+      </div>
+    </div>
+
+    <!-- 에임 트레이너 실시간 통계 -->
+    <div id="aimStats" class="aim-stats">
+      <div class="stat-item">
+        <span class="label">정확도</span>
+        <span id="accuracy" class="value highlight">0%</span>
+      </div>
+      <div class="stat-item">
+        <span class="label">콤보</span>
+        <span id="combo" class="value combo">×0</span>
+      </div>
+      <div class="stat-item">
+        <span class="label">명중</span>
+        <span id="hits" class="value">0/0</span>
+      </div>
+      <div class="stat-item">
+        <span class="label">점수</span>
+        <span id="aimScore" class="value">0</span>
+      </div>
+      <div class="stat-item">
+        <span class="label">남은</span>
+        <span id="aimTime" class="value">30s</span>
+      </div>
+      <div class="stat-item hidden" id="aimTargetWrap">
+        <span class="label">목표</span>
+        <span id="aimTarget" class="value">0</span>
+      </div>
+    </div>
+
+    <!-- 조준점 -->
+    <div id="crosshair" class="crosshair">
+      <div class="crosshair-dot"></div>
+      <div class="crosshair-line h"></div>
+      <div class="crosshair-line v"></div>
+    </div>
+
+    <!-- 감도 표시 -->
+    <div id="sensitivityDisplay" class="sensitivity-display">감도: <span id="sensitivityValue">5</span></div>
+  </div>
+
+  <script src="js/engine.js"></script>
+  <script src="js/runner.js"></script>
+  <script src="js/fishing.js"></script>
+  <script src="js/clicker_improved.js"></script>
+  <script src="js/challenge.js"></script>
+  <script src="js/main.js"></script>
+</body>
+</html>
