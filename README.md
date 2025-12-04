@@ -9,5 +9,5 @@
 #### [1107수업내용(웹게임 과제) - 1107업로드](https://github.com/qkrtkdals962/gameprogramming/commits/main/1107)
 #### [1114수업내용 - 1114업로드](https://github.com/qkrtkdals962/gameprogramming/commits/main/1114)
 #### [1121수업내용 - 1121업로드](https://github.com/qkrtkdals962/gameprogramming/commits/main/1121)
-#### [1128수업내용 - 1204업로드](https://github.com/qkrtkdals962/gameprogramming/commits/main/1204)
-#### [게임(코드 업그레이드 과제) - 1204업로드](https://github.com/qkrtkdals962/gameprogramming/commits/main/Refactor OrderRush.cpp by removing comments)
+#### [1128수업내용 - 1204업로드](https://github.com/qkrtkdals962/gameprogramming/commits/main/1128)
+#### [게임과제(코드 업그레이드 과제) - 1204업로드](https://github.com/qkrtkdals962/gameprogramming/commits/main/게임과제)
